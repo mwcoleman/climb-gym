@@ -1,0 +1,13 @@
+# Climbing fork: services added on top of openGym's own docker-compose.yml, which Docker merges
+# automatically. Keeping them here means upstream's compose file is never edited.
+services:
+  garmin-sync:
+    build: ./garmin-sync
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      GARMIN_TOKEN_DIR: /tokens
+    volumes:
+      - ./data:/data
+      - ./garmin-tokens:/tokens
+    restart: unless-stopped

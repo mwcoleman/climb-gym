@@ -45,6 +45,9 @@ const RP_NAME = process.env.RP_NAME || 'openGym';
 // INVITE_ONLY gates new signups behind a code the admin generates. Off by default, so a fresh
 // self-hosted instance stays open.
 const ADMIN_UIDS = (process.env.ADMIN_UIDS || '').split(',').map(s => s.trim()).filter(Boolean);
+// Climbing fork: DATA_DIR/garmin.json is one person's watch data, written by garmin-sync/. Unset,
+// every signed-in profile may read it (a single-user instance); set, only these uids may.
+const GARMIN_UIDS = (process.env.GARMIN_UIDS || '').split(',').map(s => s.trim()).filter(Boolean);
 const INVITE_ONLY = /^(1|true|yes|on)$/i.test(process.env.INVITE_ONLY || '');
 // The first profile made on an instance with no profiles at all becomes its admin (#328), so a
 // fresh install has someone who can open the admin dashboard without editing ADMIN_UIDS and
@@ -2190,6 +2193,22 @@ const routes = {
     if (!user) return json(res, 401, { error: 'not signed in' });
     const doc = readStateCached(user.id);
     json(res, 200, { rev: doc?._rev || 0, ...(doc?._wid ? { wid: doc._wid } : {}) });
+  },
+
+  // Climbing fork: the Garmin sessions garmin-sync/ writes to DATA_DIR/garmin.json, read-only.
+  // Never written here, so a sync that is mid-write is the only thing that can make it unreadable,
+  // and that answers 503 rather than half a document.
+  'GET /api/external/garmin': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    if (GARMIN_UIDS.length && !GARMIN_UIDS.includes(user.id)) return json(res, 403, { error: 'forbidden' });
+    let doc;
+    try { doc = JSON.parse(fs.readFileSync(path.join(DATA, 'garmin.json'), 'utf8')); }
+    catch (e) {
+      if (e.code === 'ENOENT') return json(res, 200, { activities: {} });
+      return json(res, 503, { error: 'garmin data unreadable' });
+    }
+    json(res, 200, doc);
   },
 
   'PUT /api/data': async (req, res) => {

@@ -1,0 +1,32 @@
+{
+  "mode": "piecewise",
+  "calibration_points_kg_counts": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      10.0,
+      86.04
+    ],
+    [
+      20.0,
+      180.92
+    ],
+    [
+      30.0,
+      279.17
+    ]
+  ],
+  "linear_fit": {
+    "counts_per_kg": 9.3239,
+    "intercept_counts": -3.326
+  },
+  "counts_per_kg": 9.3239,
+  "zero_offset_counts": 0,
+  "resolution_kg": 0.1073,
+  "value_decode": "value = ((byte1 & 0x3F) << 8) | byte0   # 14-bit",
+  "channel_mask": "byte1 & 0x40",
+  "notes": "4-point staircase, single thermal session, 30->20->10->0 kg. Response is slightly progressive (seg slopes 8.60 / 9.49 / 9.83 counts/kg); piecewise interpolation used in range, last-segment slope extrapolated above 30 kg.",
+  "extrapolation_warning": "above 30 kg values are extrapolated from the 20-30 kg segment"
+}

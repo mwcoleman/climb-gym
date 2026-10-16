@@ -1578,6 +1578,28 @@ paths:
                   wid: { type: string, description: 'The write id (`_wid`) of the stored document; absent before its first write.' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /api/external/garmin:
+    get:
+      tags: [data]
+      summary: Garmin sessions synced by garmin-sync (climbing fork)
+      description: |
+        `DATA_DIR/garmin.json` as the `garmin-sync` service last wrote it — read-only, and
+        `{ "activities": {} }` before its first sync. With `GARMIN_UIDS` set only those profiles
+        may read it; unset, any signed-in profile may.
+      responses:
+        '200':
+          description: The synced sessions, keyed by Garmin activity id.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activities: { type: object, additionalProperties: true }
+                  last_sync: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { description: The file exists but is not readable JSON. }
+
   /api/media/{hash}:
     parameters:
       - name: hash

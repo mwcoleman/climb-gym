@@ -30,3 +30,10 @@ frontend/bundle-size.json
 
 # Local planning notes
 docs/superpowers/plans/
+
+# Climbing fork — local-only
+scratch/
+garmin-tokens/
+.venv/
+.bleenv/
+__pycache__/

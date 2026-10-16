@@ -15,6 +15,7 @@ import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
 import { dayNoteOf } from '../lib/day-notes.js'
+import GarminWeek from '../components/GarminWeek.jsx'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -184,6 +185,20 @@ export default function Home() {
         <div className="muted small" style={{ marginBottom: 12 }}>{t('Set up your weekly routine to get going, or grab a ready-made starter plan.')}</div>
         <Button variant="primary" icon="clipboard" onClick={starterPlanSheet}>{t('Load starter plan')}</Button>
         <div style={{ height: 8 }} /><Button onClick={() => nav('/plan')}>{t('Build my own plan')}</Button>
+      </div>
+    )}
+
+    {user && <GarminWeek />}
+
+    {typeof navigator !== 'undefined' && navigator.bluetooth && (
+      <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => nav('/hang'))}>
+        <div className="row between">
+          <div className="row" style={{ gap: 9 }}>
+            <span className="lrow-i" style={{ background: 'var(--orange)' }}><Icon name="gauge" /></span>
+            <div><div className="lbl2">Forma Due</div><div className="ttl">{t('Hangboard')}</div></div>
+          </div>
+          <Icon name="chevronRight" className="chev" />
+        </div>
       </div>
     )}
 
